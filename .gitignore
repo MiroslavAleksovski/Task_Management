@@ -1,11 +1,18 @@
+#Backend
+*.obj
+Backend/*/obj/*
+Backend/*/bin/*
+
+#Fronend
+
 # Prerequisites
 *.d
+.vs
+
 
 # Object files
 *.o
 *.ko
-*.obj
-*.elf
 
 # Linker output
 *.ilk
