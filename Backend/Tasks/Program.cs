@@ -1,4 +1,3 @@
-using Dapper.FluentMap;
 using Microsoft.OpenApi;
 using Tasks.Configuration;
 
@@ -6,6 +5,9 @@ using Tasks.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+// FluentValidation registration
+builder.Services.AddFluentValidations();
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -20,12 +22,7 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
-//Dapper Fluent Mappers
-FluentMapper.Initialize(config =>
-{
-    config.AddMap(new TaskGridDomainModelMap());
-    config.AddMap(new TaskDetailsDomainModelMap());
-});
+DapperFluentMapperExtensions.AddDapperFluentMappers();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

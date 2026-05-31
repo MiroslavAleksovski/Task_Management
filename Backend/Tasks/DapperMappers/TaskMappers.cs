@@ -1,7 +1,7 @@
 ﻿using Dapper.FluentMap.Mapping;
 using Models.TaskDomainModels;
 
-namespace Tasks.Configuration
+namespace Tasks.DapperMappers
 {
     public class TaskGridDomainModelMap : EntityMap<TaskGridDomainModel>
     {
