@@ -1,9 +1,8 @@
 ﻿namespace Models.TaskDomainModels
 {
-    public class TaskDetailsDomainModel
+    public class TaskGridDomainModel
     {
         public Guid Id { get; set; }
         public required string Name { get; set; }
-        public string? Description { get; set; }
     }
 }

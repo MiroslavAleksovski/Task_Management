@@ -22,13 +22,65 @@ namespace AccessLevel.Implementations
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<TaskDetailsDomainModel>> GetTasksAsync()
+        public async Task<IEnumerable<TaskGridDomainModel>> GetTasks()
         {
             using IDbConnection db = new SqlConnection(_connectionString);
 
-            var result = await db.QueryAsync<TaskDetailsDomainModel>(SQLQueriesConstants.GetTasksQuery);
+            var result = await db.QueryAsync<TaskGridDomainModel>(SQLQueriesConstants.GetTasksQuery);
 
             return result;
+        }
+
+        public async Task<TaskDetailsDomainModel?> GetTask(Guid taskId)
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", taskId, DbType.Guid);
+
+            TaskDetailsDomainModel? result = await db.QueryFirstOrDefaultAsync<TaskDetailsDomainModel>(
+                SQLQueriesConstants.GetTaskQuery,
+                parameters);
+
+            return result;
+        }
+
+        public async Task<Guid> AddTask(TaskDetailsDomainModel task)
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", task.Id, DbType.Guid, ParameterDirection.Input);
+            parameters.Add("Name", task.Name, DbType.String, ParameterDirection.Input, size: 50);
+            parameters.Add("Description", task.Description, DbType.String, ParameterDirection.Input, size: -1);
+
+            await db.ExecuteAsync(SQLQueriesConstants.InsertTaskQuery, parameters);
+
+            return task.Id;
+        }
+
+        public async Task<Guid> UpdateTask(TaskDetailsDomainModel task)
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", task.Id, DbType.Guid, ParameterDirection.Input);
+            parameters.Add("Name", task.Name, DbType.String, ParameterDirection.Input, size: 50);
+            parameters.Add("Description", task.Description, DbType.String, ParameterDirection.Input, size: -1);
+
+            var rows = await db.ExecuteAsync(SQLQueriesConstants.UpdateTaskQuery, parameters);
+            return task.Id;
+        }
+
+        public async Task<bool> DeleteTask(Guid taskId)
+        {
+            using IDbConnection db = new SqlConnection(_connectionString);
+
+            var parameters = new DynamicParameters();
+            parameters.Add("Id", taskId, DbType.Guid, ParameterDirection.Input);
+
+            var rows = await db.ExecuteAsync(SQLQueriesConstants.DeleteTaskQuery, parameters);
+            return rows > 0;
         }
     }
 }

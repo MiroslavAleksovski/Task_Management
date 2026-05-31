@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="../DataAccess/DataAccess.csproj" Id="9e722b19-f884-4872-a7c4-005c75ffea1e" />
   <Project Path="../Infrastructure/Infrastructure.csproj" Id="4a9b3dc8-fec2-4284-868d-b9ca2dcb2a00" />
+  <Project Path="../Mappers/Mappers.csproj" Id="17f48fef-20ee-4f6b-96ae-783e89f7dcee" />
   <Project Path="../Models/Models.csproj" Id="dc9ecdcc-5c91-4e71-b223-6c6057434beb" />
   <Project Path="../Services/Services.csproj" Id="8687eb87-c500-4c92-b8d5-a31e43e6c1b9" />
   <Project Path="Tasks.csproj" />

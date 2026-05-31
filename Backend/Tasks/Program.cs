@@ -23,6 +23,7 @@ var app = builder.Build();
 //Dapper Fluent Mappers
 FluentMapper.Initialize(config =>
 {
+    config.AddMap(new TaskGridDomainModelMap());
     config.AddMap(new TaskDetailsDomainModelMap());
 });
 
