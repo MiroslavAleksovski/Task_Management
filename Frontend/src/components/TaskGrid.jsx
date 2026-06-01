@@ -21,6 +21,7 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import settings from '../../appsettings.json';
 
@@ -52,8 +53,12 @@ function TaskGrid() {
     loadTasks();
   }, [baseURL]);
 
-  const handleTaskClick = (taskId) => {
+  const handleEditClick = (taskId) => {
     navigate(`/tasks/${taskId}`);
+  };
+
+  const handleViewClick = (taskId) => {
+    navigate(`/tasks/${taskId}?mode=view`);
   };
 
   const handleDeleteClick = (task) => {
@@ -127,9 +132,15 @@ function TaskGrid() {
                     {task.name}
                   </TableCell>
                   <TableCell align="right">
+                      <IconButton
+                      aria-label={`view ${task.name}`}
+                      onClick={() => handleViewClick(task.id)}
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
                     <IconButton
                       aria-label={`edit ${task.name}`}
-                      onClick={() => handleTaskClick(task.id)}
+                      onClick={() => handleEditClick(task.id)}
                     >
                       <EditIcon />
                     </IconButton>

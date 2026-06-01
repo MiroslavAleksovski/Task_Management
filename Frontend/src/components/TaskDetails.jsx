@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Container, TextField, Button, Box, Typography, Paper } from '@mui/material';
 import settings from '../../appsettings.json';
 
 function TaskDetails() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [task, setTask] = useState({ name: '', description: '' });
   const [loading, setLoading] = useState(id !== 'new');
   const baseURL = settings.baseURL;
   const isNewTask = id === 'new';
+  const isViewMode = searchParams.get('mode') === 'view';
 
   useEffect(() => {
     if (!isNewTask) {
@@ -96,7 +98,7 @@ function TaskDetails() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
-        {isNewTask ? 'Add New Task' : 'Task Details'}
+        {isNewTask ? 'Add New Task' : isViewMode ? 'View Task' : 'Task Details'}
       </Typography>
 
       <Paper sx={{ p: 3, mb: 3 }}>
@@ -109,6 +111,7 @@ function TaskDetails() {
             placeholder="Enter task name"
             fullWidth
             variant="outlined"
+            disabled={isViewMode}
           />
 
           <TextField
@@ -121,24 +124,21 @@ function TaskDetails() {
             rows={4}
             fullWidth
             variant="outlined"
+            disabled={isViewMode}
           />
-
-          {task.id && (
-            <Typography variant="body2">
-              <strong>ID:</strong> {task.id}
-            </Typography>
-          )}
         </Box>
       </Paper>
 
       <Box sx={{ display: 'flex', gap: 2 }}>
-        <Button 
-          variant="contained" 
-          color="primary"
-          onClick={handleSave}
-        >
-          {isNewTask ? 'Create Task' : 'Save Changes'}
-        </Button>
+        {!isViewMode && (
+          <Button 
+            variant="contained" 
+            color="primary"
+            onClick={handleSave}
+          >
+            {isNewTask ? 'Create Task' : 'Save Changes'}
+          </Button>
+        )}
         <Button 
           variant="outlined"
           onClick={() => navigate('/tasks')}
