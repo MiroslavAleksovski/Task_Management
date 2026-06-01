@@ -16,9 +16,9 @@ namespace Services.Implementations
             _taskRepository = taskRepository;
         }
 
-        public async Task<IEnumerable<TaskGridDTOModel>> GetTasks()
+        public async Task<IEnumerable<TaskGridDTOModel>> GetTasks(TaskFilterModel? filter = null)
         {
-            var domainTasks = await _taskRepository.GetTasks();
+            var domainTasks = await _taskRepository.GetTasks(filter);
             var dtoItems = domainTasks.Select(x => x.ToTaskGridDTOModel());
             return dtoItems;
         }
@@ -44,7 +44,8 @@ namespace Services.Implementations
             {
                 Id = taskDto.Id ?? Guid.NewGuid(),
                 Name = taskDto.Name,
-                Description = taskDto.Description
+                Description = taskDto.Description,
+                IsCompleted = taskDto.IsCompleted
             };
 
             if (taskDto.Id.HasValue)

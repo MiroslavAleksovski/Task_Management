@@ -9,6 +9,7 @@ namespace Tasks.DapperMappers
         {
             Map(i => i.Id).ToColumn("TaskId");
             Map(i => i.Name).ToColumn("TaskName");
+            Map(i => i.IsCompleted).ToColumn("IsCompleted");
         }
     }
 
@@ -19,6 +20,7 @@ namespace Tasks.DapperMappers
             Map(i => i.Id).ToColumn("TaskId");
             Map(i => i.Name).ToColumn("TaskName");
             Map(i => i.Description).ToColumn("TaskDescription");
+            Map(i => i.IsCompleted).ToColumn("IsCompleted");
         }
     }
 }

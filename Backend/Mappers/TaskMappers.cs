@@ -7,7 +7,12 @@ namespace Mappers
     {
         public static TaskGridDTOModel ToTaskGridDTOModel(this TaskGridDomainModel domainModel)
         {
-            return new TaskGridDTOModel { Id = domainModel.Id, Name = domainModel.Name };
+            return new TaskGridDTOModel
+            {
+                Id = domainModel.Id,
+                Name = domainModel.Name,
+                IsCompleted = domainModel.IsCompleted
+            };
         }
 
         public static TaskDetailsDTOModel ToTaskDetailsDTOModel(this TaskDetailsDomainModel domainModel)
@@ -16,7 +21,8 @@ namespace Mappers
             {
                 Id = domainModel.Id,
                 Name = domainModel.Name,
-                Description = domainModel.Description
+                Description = domainModel.Description,
+                IsCompleted = domainModel.IsCompleted
             };
         }
     }

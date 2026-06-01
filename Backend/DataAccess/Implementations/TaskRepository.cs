@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Models.TaskDomainModels;
+using Models.TaskDTOModels;
 using System.Data;
 
 namespace AccessLevel.Implementations
@@ -21,14 +22,33 @@ namespace AccessLevel.Implementations
             }
             _connectionString = connectionString;
         }
-
-        public async Task<IEnumerable<TaskGridDomainModel>> GetTasks()
+        public async Task<IEnumerable<TaskGridDomainModel>> GetTasks(TaskFilterModel? filter = null)
         {
             using IDbConnection db = new SqlConnection(_connectionString);
 
-            var result = await db.QueryAsync<TaskGridDomainModel>(SQLQueriesConstants.GetTasksQuery);
+            if (filter == null)
+            {
+                var result = await db.QueryAsync<TaskGridDomainModel>(SQLQueriesConstants.GetTasksQuery);
+                return result;
+            }
 
-            return result;
+            // build dynamic query based on filter
+            var sql = SQLQueriesConstants.GetTasksQuery + " WHERE 1=1";
+            var parameters = new DynamicParameters();
+
+            var isCompletedProp = filter.GetType().GetProperty("IsCompleted");
+            if (isCompletedProp != null)
+            {
+                var val = isCompletedProp.GetValue(filter);
+                if (val != null)
+                {
+                    sql += " AND IsCompleted = @IsCompleted";
+                    parameters.Add("IsCompleted", val, DbType.Boolean);
+                }
+            }
+
+            var filtered = await db.QueryAsync<TaskGridDomainModel>(sql, parameters);
+            return filtered;
         }
 
         public async Task<TaskDetailsDomainModel?> GetTask(Guid taskId)
@@ -36,7 +56,7 @@ namespace AccessLevel.Implementations
             using IDbConnection db = new SqlConnection(_connectionString);
 
             var parameters = new DynamicParameters();
-            parameters.Add("Id", taskId, DbType.Guid);
+            parameters.Add("Id", taskId, DbType.Guid, ParameterDirection.Input);
 
             TaskDetailsDomainModel? result = await db.QueryFirstOrDefaultAsync<TaskDetailsDomainModel>(
                 SQLQueriesConstants.GetTaskQuery,
@@ -53,6 +73,7 @@ namespace AccessLevel.Implementations
             parameters.Add("Id", task.Id, DbType.Guid, ParameterDirection.Input);
             parameters.Add("Name", task.Name, DbType.String, ParameterDirection.Input, size: 50);
             parameters.Add("Description", task.Description, DbType.String, ParameterDirection.Input, size: -1);
+            parameters.Add("IsCompleted", task.IsCompleted, DbType.Boolean, ParameterDirection.Input);
 
             await db.ExecuteAsync(SQLQueriesConstants.InsertTaskQuery, parameters);
 
@@ -67,6 +88,7 @@ namespace AccessLevel.Implementations
             parameters.Add("Id", task.Id, DbType.Guid, ParameterDirection.Input);
             parameters.Add("Name", task.Name, DbType.String, ParameterDirection.Input, size: 50);
             parameters.Add("Description", task.Description, DbType.String, ParameterDirection.Input, size: -1);
+            parameters.Add("IsCompleted", task.IsCompleted, DbType.Boolean, ParameterDirection.Input);
 
             var rows = await db.ExecuteAsync(SQLQueriesConstants.UpdateTaskQuery, parameters);
             return task.Id;

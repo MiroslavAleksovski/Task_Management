@@ -9,19 +9,22 @@ namespace Tasks.Controllers
     public class TaskController(ITaskService taskService) : BaseController
     {
         /// <summary>
-        /// Retrieves all tasks.
+        /// Retrieves tasks optionally filtered by the provided filter model.
         /// </summary>
-        /// <returns>List of task grid DTOs.</returns>
+        /// <param name="filter">Optional filter supplied in the request body. If omitted, all tasks are returned.</param>
+        /// <response code="200">Returns the list of tasks matching the filter.</response>
+        /// <response code="400">Bad request when the provided filter is invalid.</response>
+        /// <response code="500">Server error while processing the request.</response>
         [Tags("Task")]
-        [HttpGet(Name = "GetTasks")]
+        [HttpPost(Name = "GetTasks")]
         [ProducesResponseType(typeof(IEnumerable<TaskGridDTOModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<TaskGridDTOModel>>> GetTasks()
+        public async Task<ActionResult<IEnumerable<TaskGridDTOModel>>> GetTasks([FromBody] TaskFilterModel? filter = null)
         {
             try
             {
-                var items = await taskService.GetTasks();
+                var items = await taskService.GetTasks(filter);
                 return Ok(items);
             }
             catch (CustomException ex)
@@ -35,10 +38,13 @@ namespace Tasks.Controllers
         }
 
         /// <summary>
-        /// Retrieves a task by id.
+        /// Retrieves a single task by id.
         /// </summary>
         /// <param name="taskId">Task unique identifier (GUID).</param>
-        /// <returns>Task details DTO.</returns>
+        /// <response code="200">Returns the task details.</response>
+        /// <response code="404">Task with the specified id was not found.</response>
+        /// <response code="400">Bad request when the provided id is invalid.</response>
+        /// <response code="500">Server error while processing the request.</response>
         [Tags("Task")]
         [HttpGet("{taskId:Guid}", Name = "GetTask")]
         [ProducesResponseType(typeof(TaskDetailsDTOModel), StatusCodes.Status200OK)]
@@ -65,7 +71,9 @@ namespace Tasks.Controllers
         /// Adds a new task or updates an existing one.
         /// </summary>
         /// <param name="taskDto">Task DTO with data to insert or update.</param>
-        /// <returns>GUID of the created or updated task.</returns>
+        /// <response code="200">Returns the GUID of the created or updated task.</response>
+        /// <response code="400">Bad request when the provided model is invalid.</response>
+        /// <response code="500">Server error while processing the request.</response>
         [Tags("Task")]
         [HttpPost(Name = "AddUpdateTask")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
@@ -93,7 +101,9 @@ namespace Tasks.Controllers
         /// Deletes a task by id.
         /// </summary>
         /// <param name="taskId">Task unique identifier (GUID).</param>
-        /// <returns>HTTP 200 on success.</returns>
+        /// <response code="200">Task deleted successfully.</response>
+        /// <response code="400">Bad request when the provided id is invalid.</response>
+        /// <response code="500">Server error while processing the request.</response>
         [Tags("Task")]
         [HttpDelete("{taskId:Guid}", Name = "DeleteTask")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
