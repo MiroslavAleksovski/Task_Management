@@ -1,0 +1,168 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  Container,
+  Button,
+  Box,
+  Typography,
+  IconButton,
+  Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import settings from '../../appsettings.json';
+
+function TaskGrid() {
+  const [tasks, setTasks] = useState([]);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState(null);
+  const baseURL = settings.baseURL;
+  const navigate = useNavigate();
+
+  const loadTasks = async () => {
+    try {
+      const response = await fetch(`${baseURL}task/gettasks`);
+      if (!response.ok) {
+        console.warn('Backend responded with status', response.status);
+        return;
+      }
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setTasks(data);
+      }
+    } catch (error) {
+      console.warn('Could not load tasks from backend:', error);
+    }
+  };
+
+  useEffect(() => {
+    loadTasks();
+  }, [baseURL]);
+
+  const handleTaskClick = (taskId) => {
+    navigate(`/tasks/${taskId}`);
+  };
+
+  const handleDeleteClick = (task) => {
+    setTaskToDelete(task);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleCancelDelete = () => {
+    setTaskToDelete(null);
+    setDeleteDialogOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!taskToDelete?.id) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${baseURL}task/DeleteTask/${taskToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        console.warn('Failed to delete task', response.status);
+        alert('Unable to delete task. Please try again.');
+        return;
+      }
+
+      handleCancelDelete();
+      loadTasks();
+    } catch (error) {
+      console.warn('Error deleting task:', error);
+      alert('Unable to delete task. Please try again.');
+    }
+  };
+
+  const handleAddNewTask = () => {
+    navigate('/tasks/new');
+  };
+
+  return (
+    <Container sx={{ py: 4 }}>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Task Management
+      </Typography>
+
+      <Box sx={{ mb: 3 }}>
+        <Button 
+          variant="contained" 
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={handleAddNewTask}
+        >
+          Add New Task
+        </Button>
+      </Box>
+
+      <Paper>
+        <TableContainer>
+          <Table sx={{ minWidth: 650 }} aria-label="tasks table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Task</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tasks.map((task) => (
+                <TableRow key={task.id} hover>
+                  <TableCell component="th" scope="row">
+                    {task.name}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      aria-label={`edit ${task.name}`}
+                      onClick={() => handleTaskClick(task.id)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      aria-label={`delete ${task.name}`}
+                      onClick={() => handleDeleteClick(task)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
+
+      <Dialog open={deleteDialogOpen} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete the task "{taskToDelete?.name}"? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button color="error" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Container>
+  );
+}
+
+export default TaskGrid;

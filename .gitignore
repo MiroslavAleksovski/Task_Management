@@ -4,6 +4,7 @@ Backend/*/obj/*
 Backend/*/bin/*
 
 #Fronend
+Frontend/node_modules
 
 # Prerequisites
 *.d
