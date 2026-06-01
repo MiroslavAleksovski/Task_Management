@@ -3,7 +3,7 @@ Interview trial task project
 
 Steps to run the whole project:
 
-Clone the repo from https://github.com/MiroslavAleksovski/Task_Management.git, publicly accessible repo by Miroslav Aleksovski, so permission issue should not happen
+Clone the repo from https://github.com/MiroslavAleksovski/Task_Management.git, publicly accessible repo by Miroslav Aleksovski, so permission issues should not happen
 #Frontend
 	Frontend part is under Frontend folder, open this folder with Visual Studio Code and navigate to this folder to be root directory
 	Run npm i, to install all neccesarry libraries
