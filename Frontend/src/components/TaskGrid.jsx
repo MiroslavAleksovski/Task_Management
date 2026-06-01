@@ -18,6 +18,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -29,12 +34,23 @@ function TaskGrid() {
   const [tasks, setTasks] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [filterIsCompleted, setFilterIsCompleted] = useState('all');
   const baseURL = settings.baseURL;
   const navigate = useNavigate();
 
   const loadTasks = async () => {
     try {
-      const response = await fetch(`${baseURL}task/gettasks`);
+      let isCompletedValue = null;
+      if (filterIsCompleted === 'true') isCompletedValue = true;
+      if (filterIsCompleted === 'false') isCompletedValue = false;
+
+      const response = await fetch(`${baseURL}task/gettasks`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(isCompletedValue === null ? null : { isCompleted: isCompletedValue }),
+      });
       if (!response.ok) {
         console.warn('Backend responded with status', response.status);
         return;
@@ -51,7 +67,7 @@ function TaskGrid() {
 
   useEffect(() => {
     loadTasks();
-  }, [baseURL]);
+  }, [baseURL, filterIsCompleted]);
 
   const handleEditClick = (taskId) => {
     navigate(`/tasks/${taskId}`);
@@ -99,13 +115,17 @@ function TaskGrid() {
     navigate('/tasks/new');
   };
 
+  const handleFilterChange = (e) => {
+    setFilterIsCompleted(e.target.value);
+  };
+
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" sx={{ mb: 3 }}>
         Task Management
       </Typography>
 
-      <Box sx={{ mb: 3 }}>
+      <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
         <Button 
           variant="contained" 
           color="primary"
@@ -114,6 +134,20 @@ function TaskGrid() {
         >
           Add New Task
         </Button>
+
+        <FormControl sx={{ minWidth: 160 }}>
+          <InputLabel id="filter-label">Filter by Status</InputLabel>
+          <Select
+            labelId="filter-label"
+            value={filterIsCompleted}
+            label="Filter by Status"
+            onChange={handleFilterChange}
+          >
+            <MenuItem value="all">All Tasks</MenuItem>
+            <MenuItem value="true">Completed</MenuItem>
+            <MenuItem value="false">Incomplete</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
 
       <Paper>
@@ -122,6 +156,7 @@ function TaskGrid() {
             <TableHead>
               <TableRow>
                 <TableCell>Task</TableCell>
+                <TableCell align="center">Completed</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -131,8 +166,11 @@ function TaskGrid() {
                   <TableCell component="th" scope="row">
                     {task.name}
                   </TableCell>
+                  <TableCell align="center">
+                    <Checkbox checked={!!task.isCompleted} disabled />
+                  </TableCell>
                   <TableCell align="right">
-                      <IconButton
+                    <IconButton
                       aria-label={`view ${task.name}`}
                       onClick={() => handleViewClick(task.id)}
                     >

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, TextField, Button, Box, Typography, Paper } from '@mui/material';
+import { Container, TextField, Button, Box, Typography, Paper, Checkbox, FormControlLabel } from '@mui/material';
 import settings from '../../appsettings.json';
 
 function TaskDetails() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [task, setTask] = useState({ name: '', description: '' });
+  const [task, setTask] = useState({ name: '', description: '', isCompleted: false });
   const [loading, setLoading] = useState(id !== 'new');
   const baseURL = settings.baseURL;
   const isNewTask = id === 'new';
@@ -38,10 +38,10 @@ function TaskDetails() {
   }, [id, baseURL, isNewTask]);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setTask((prevTask) => ({
       ...prevTask,
-      [name]: value,
+      [name]: type === 'checkbox' ? checked : value,
     }));
   };
 
@@ -50,6 +50,7 @@ function TaskDetails() {
       id: task.id || null,
       name: task.name.trim(),
       description: task.description || null,
+      isCompleted: !!task.isCompleted,
     };
 
     setLoading(true);
@@ -112,6 +113,18 @@ function TaskDetails() {
             fullWidth
             variant="outlined"
             disabled={isViewMode}
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="isCompleted"
+                checked={!!task.isCompleted}
+                onChange={handleInputChange}
+                disabled={isViewMode}
+              />
+            }
+            label="Completed"
           />
 
           <TextField
