@@ -7,7 +7,7 @@ using Models.TaskDomainModels;
 using Models.TaskDTOModels;
 using System.Data;
 
-namespace AccessLevel.Implementations
+namespace DataAccess.Implementations
 {
     public class TaskRepository : ITaskRepository
     {
@@ -22,6 +22,7 @@ namespace AccessLevel.Implementations
             }
             _connectionString = connectionString;
         }
+
         public async Task<IEnumerable<TaskGridDomainModel>> GetTasks(TaskFilterModel? filter = null)
         {
             using IDbConnection db = new SqlConnection(_connectionString);
