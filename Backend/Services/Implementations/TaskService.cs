@@ -1,8 +1,9 @@
+using AccessLevel.Interfaces;
+using Infrastructure.ExceptionExtensions;
+using Mappers;
+using Models.TaskDomainModels;
 using Models.TaskDTOModels;
 using Services.Interfaces;
-using AccessLevel.Interfaces;
-using Models.TaskDomainModels;
-using Mappers;
 
 namespace Services.Implementations
 {
@@ -36,7 +37,8 @@ namespace Services.Implementations
 
         public async Task<Guid> AddUpdateTask(TaskAddUpdateDTOModel taskDto)
         {
-            if (taskDto == null) throw new ArgumentNullException(nameof(taskDto));
+            //throw custom exception if incoming data is null
+            if (taskDto == null) throw new CustomArgumentNullException("The incoming task data is null.");
 
             var domain = new TaskDetailsDomainModel
             {
