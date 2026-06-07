@@ -7,6 +7,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/tasks" replace />} />
       <Route path="/tasks" element={<TaskGrid />} />
+      <Route path="/tasks/new" element={<TaskDetails />} />
       <Route path="/tasks/:id" element={<TaskDetails />} />
       <Route path="*" element={<Navigate to="/tasks" replace />} />
     </Routes>

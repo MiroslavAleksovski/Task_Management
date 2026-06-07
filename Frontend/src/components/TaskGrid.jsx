@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { from, of, Subscription } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
+import { setViewMode } from '../store/slices/taskDetailsSlice';
 import {
   Container,
   Button,
@@ -39,6 +41,7 @@ function TaskGrid() {
   const [filterIsCompleted, setFilterIsCompleted] = useState('all');
   const baseURL = settings.baseURL;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const loadTasks = () => {
     let isCompletedValue = null;
@@ -71,11 +74,13 @@ function TaskGrid() {
   }, [baseURL, filterIsCompleted]);
 
   const handleEditClick = (taskId) => {
+    dispatch(setViewMode('edit'));
     navigate(`/tasks/${taskId}`);
   };
 
   const handleViewClick = (taskId) => {
-    navigate(`/tasks/${taskId}?mode=view`);
+    dispatch(setViewMode('view'));
+    navigate(`/tasks/${taskId}`);
   };
 
   const handleDeleteClick = (task) => {
@@ -113,6 +118,7 @@ function TaskGrid() {
   };
 
   const handleAddNewTask = () => {
+    dispatch(setViewMode('edit'));
     navigate('/tasks/new');
   };
 

@@ -1,17 +1,21 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { Container, TextField, Button, Box, Typography, Paper, Checkbox, FormControlLabel } from '@mui/material';
+import { resetMode, setViewMode } from '../store/slices/taskDetailsSlice';
 import settings from '../../appsettings.json';
 
 function TaskDetails() {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const viewMode = useSelector(state => state.TaskDetails.mode);
   const [task, setTask] = useState({ name: '', description: '', isCompleted: false });
-  const [loading, setLoading] = useState(id !== 'new');
   const baseURL = settings.baseURL;
-  const isNewTask = id === 'new';
-  const isViewMode = searchParams.get('mode') === 'view';
+  const isNewTask = location.pathname.split('/').pop() === 'new';
+  const [loading, setLoading] = useState(!isNewTask);
+  const isViewMode = viewMode === 'view';
 
   // Promise-based helper using callbacks (no async/await)
   function fetchWithCallbacks(url, options, { onSuccess, onError } = {}) {
@@ -49,6 +53,16 @@ function TaskDetails() {
       loadTaskDetail();
     }
   }, [id, baseURL, isNewTask]);
+
+  // Set mode on mount and cleanup on unmount
+  useEffect(() => {
+    if (isNewTask) {
+      dispatch(setViewMode('edit'));
+    }
+    return () => {
+      dispatch(resetMode());
+    };
+  }, [isNewTask, dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
