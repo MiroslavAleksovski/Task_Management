@@ -5,6 +5,7 @@ Backend/*/bin/*
 
 #Fronend
 Frontend/node_modules
+Frontend/dist
 
 # Prerequisites
 *.d

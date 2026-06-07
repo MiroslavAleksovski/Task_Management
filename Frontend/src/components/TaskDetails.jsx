@@ -13,24 +13,37 @@ function TaskDetails() {
   const isNewTask = id === 'new';
   const isViewMode = searchParams.get('mode') === 'view';
 
+  // Promise-based helper using callbacks (no async/await)
+  function fetchWithCallbacks(url, options, { onSuccess, onError } = {}) {
+    return fetch(url, options)
+      .then(response => {
+        return response.json();
+      })
+      .then(data => {
+        if (onSuccess) onSuccess(data);
+        return data;
+      })
+      .catch(err => {
+        if (onError) onError(err);
+        throw err;
+      });
+  }
+
   useEffect(() => {
     if (!isNewTask) {
-      async function loadTaskDetail() {
-        try {
-          const response = await fetch(`${baseURL}task/gettask/${id}`);
-          if (!response.ok) {
-            console.warn('Failed to load task details');
-            setLoading(false);
-            return;
-          }
+      function loadTaskDetail() {
+        setLoading(true);
 
-          const data = await response.json();
-          setTask(data);
-        } catch (error) {
-          console.warn('Could not load task details from backend:', error);
-        } finally {
-          setLoading(false);
-        }
+        fetch(`${baseURL}task/gettask/${id}`,
+          { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+          .then(response => {
+            response.json().then(data => {
+              setTask(data);
+            });
+          })
+          .catch(err => {
+          })
+          .finally(() => setLoading(false));
       }
 
       loadTaskDetail();
@@ -45,38 +58,32 @@ function TaskDetails() {
     }));
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     const addEditTask = {
       id: task.id || null,
       name: task.name.trim(),
       description: task.description || null,
       isCompleted: !!task.isCompleted,
     };
-
     setLoading(true);
 
-    try {
-      const response = await fetch(`${baseURL}task/AddUpdateTask`, {
+    fetchWithCallbacks(
+      `${baseURL}task/AddUpdateTask`,
+      {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(addEditTask),
-      });
-
-      if (!response.ok) {
-        console.warn('Failed to save task');
-        alert('Unable to save task. Please try again.');
-        return;
+      },
+      {
+        onSuccess: () => navigate('/tasks'),
+        onError: err => {
+          console.warn('Error saving task:', err);
+          alert('Unable to save task. Please try again.');
+        },
       }
-
-      navigate('/tasks');
-    } catch (error) {
-      console.warn('Error saving task:', error);
-      alert('Unable to save task. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    )
+      .catch(() => { })
+      .finally(() => setLoading(false));
   };
 
   if (loading) {
@@ -144,15 +151,15 @@ function TaskDetails() {
 
       <Box sx={{ display: 'flex', gap: 2 }}>
         {!isViewMode && (
-          <Button 
-            variant="contained" 
+          <Button
+            variant="contained"
             color="primary"
             onClick={handleSave}
           >
             {isNewTask ? 'Create Task' : 'Save Changes'}
           </Button>
         )}
-        <Button 
+        <Button
           variant="outlined"
           onClick={() => navigate('/tasks')}
         >

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { from, of, Subscription } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 import {
   Container,
   Button,
@@ -38,31 +40,30 @@ function TaskGrid() {
   const baseURL = settings.baseURL;
   const navigate = useNavigate();
 
-  const loadTasks = async () => {
-    try {
-      let isCompletedValue = null;
-      if (filterIsCompleted === 'true') isCompletedValue = true;
-      if (filterIsCompleted === 'false') isCompletedValue = false;
+  const loadTasks = () => {
+    let isCompletedValue = null;
+    if (filterIsCompleted === 'true') isCompletedValue = true;
+    if (filterIsCompleted === 'false') isCompletedValue = false;
 
-      const response = await fetch(`${baseURL}task/gettasks`, {
+    from(
+      fetch(`${baseURL}task/gettasks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(isCompletedValue === null ? null : { isCompleted: isCompletedValue }),
-      });
-      if (!response.ok) {
-        console.warn('Backend responded with status', response.status);
-        return;
+      })
+    ).subscribe({
+      next: response => {
+        from(response.json()).subscribe({
+          next: data => setTasks(data),
+          error: err => console.warn('Failed to parse tasks JSON', err)
+        });
+      },
+      error: err => {
+        console.warn('Failed to load tasks', err);
       }
-
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setTasks(data);
-      }
-    } catch (error) {
-      console.warn('Could not load tasks from backend:', error);
-    }
+    });
   };
 
   useEffect(() => {
@@ -126,8 +127,8 @@ function TaskGrid() {
       </Typography>
 
       <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={handleAddNewTask}
