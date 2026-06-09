@@ -9,15 +9,17 @@
                                                               IsCompleted
                                                               FROM Tasks
                                                               WHERE Id = @Id";
-
         public static readonly string InsertTaskQuery = @"INSERT INTO Tasks (Id, [Name], Description, IsCompleted)
                                                           VALUES (@Id, @Name, @Description, @IsCompleted)";
-
         public static readonly string UpdateTaskQuery = @"UPDATE Tasks
                                                           SET [Name] = @Name,
                                                               Description = @Description,
                                                               IsCompleted = @IsCompleted
                                                           WHERE Id = @Id";
         public static readonly string DeleteTaskQuery = @"DELETE FROM Tasks WHERE Id = @Id";
+
+
+        public static readonly string CheckUserExistsQuery = @"SELECT COUNT(*) FROM Users WHERE Email = @Email";
+        public static readonly string InsertNewUserQuery = @"INSERT INTO Users (Id, Name, Surname, Email, PasswordHash) VALUES (@UserId, @Name, @Surname, @Email, @PasswordHash)";
     }
 }

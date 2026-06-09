@@ -1,11 +1,13 @@
 using Infrastructure.ExceptionExtensions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Models.TaskDTOModels;
 using Services.Interfaces;
 
 namespace Tasks.Controllers
 {
+    [Authorize]
+    [Tags("Task")]
     public class TaskController(ITaskService taskService) : BaseController
     {
         /// <summary>
@@ -15,7 +17,6 @@ namespace Tasks.Controllers
         /// <response code="200">Returns the list of tasks matching the filter.</response>
         /// <response code="400">Bad request when the provided filter is invalid.</response>
         /// <response code="500">Server error while processing the request.</response>
-        [Tags("Task")]
         [HttpPost(Name = "GetTasks")]
         [ProducesResponseType(typeof(IEnumerable<TaskGridDTOModel>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -45,7 +46,6 @@ namespace Tasks.Controllers
         /// <response code="404">Task with the specified id was not found.</response>
         /// <response code="400">Bad request when the provided id is invalid.</response>
         /// <response code="500">Server error while processing the request.</response>
-        [Tags("Task")]
         [HttpGet("{taskId:Guid}", Name = "GetTask")]
         [ProducesResponseType(typeof(TaskDetailsDTOModel), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,7 +74,6 @@ namespace Tasks.Controllers
         /// <response code="200">Returns the GUID of the created or updated task.</response>
         /// <response code="400">Bad request when the provided model is invalid.</response>
         /// <response code="500">Server error while processing the request.</response>
-        [Tags("Task")]
         [HttpPost(Name = "AddUpdateTask")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -104,7 +103,6 @@ namespace Tasks.Controllers
         /// <response code="200">Task deleted successfully.</response>
         /// <response code="400">Bad request when the provided id is invalid.</response>
         /// <response code="500">Server error while processing the request.</response>
-        [Tags("Task")]
         [HttpDelete("{taskId:Guid}", Name = "DeleteTask")]
         [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
