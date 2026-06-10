@@ -69,8 +69,7 @@ namespace Services.Implementations
             {
                 Token = token,
                 Email = request.Email,
-                ExpiresIn = expirationMinutes * 60,
-                Message = "Login successful."
+                ExpiresIn = expirationMinutes * 60
             };
         }
 

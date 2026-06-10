@@ -4,6 +4,7 @@ using Microsoft.OpenApi;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using Infrastructure.Middlewares;
 using Tasks.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -129,6 +130,9 @@ app.UseHttpsRedirection();
 
 // Enable CORS
 app.UseCors("AllowAll");
+
+// Extract JWT from cookie into Authorization header
+app.UseMiddleware<JwtCookieMiddleware>();
 
 // Enable authentication and authorization
 app.UseAuthentication();
