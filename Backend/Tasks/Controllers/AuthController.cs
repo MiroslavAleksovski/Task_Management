@@ -65,7 +65,7 @@ namespace Tasks.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.Unspecified,
                     Expires = DateTimeOffset.UtcNow.AddSeconds(response.ExpiresIn)
                 });
 
