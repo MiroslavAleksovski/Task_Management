@@ -54,6 +54,7 @@ function TaskGrid() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(isCompletedValue === null ? null : { isCompleted: isCompletedValue }),
       })
     ).subscribe({
@@ -101,6 +102,7 @@ function TaskGrid() {
     try {
       const response = await fetch(`${baseURL}task/DeleteTask/${taskToDelete.id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
 
       if (!response.ok) {

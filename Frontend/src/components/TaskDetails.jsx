@@ -39,7 +39,7 @@ function TaskDetails() {
         setLoading(true);
 
         fetch(`${baseURL}task/gettask/${id}`,
-          { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+          { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include' })
           .then(response => {
             response.json().then(data => {
               setTask(data);
@@ -86,6 +86,7 @@ function TaskDetails() {
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(addEditTask),
       },
       {
